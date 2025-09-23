@@ -4,3 +4,5 @@ Pour l'instant il y a les cours :
 * Théorie des graphes
 * Apprentissage supervisé
 * Apprentissage non supervisé
+
+  **Il manque les systèmes numériques !!!**
