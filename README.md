@@ -3,3 +3,4 @@ Normalement, tout le monde peut faire des propositions de modifications il suffi
 Pour l'instant il y a les cours :
 * Théorie des graphes
 * Apprentissage supervisé
+* Apprentissage non supervisé
