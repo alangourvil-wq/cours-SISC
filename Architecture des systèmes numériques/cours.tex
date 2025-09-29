@@ -92,7 +92,7 @@ La table de Karnaugh est un outil graphique utilisé pour simplifier les express
 
 % Expression simplifiée
 L'expression simplifiée de cette table de Karnaugh est :
-\[ F = \bar{a}\bar{d} + abd + bcd \]
+\[ F = \bar{a}\bar{d} + abd + \bar{b}cd \]
 
 \section*{Simplification des fonctions logiques}
 
@@ -105,12 +105,12 @@ La simplification des fonctions logiques est essentielle pour réduire la comple
     \item \textbf{Règle 1} : Il est possible d'ajouter un terme déjà existant dans une équation logique. Par exemple, si on a :
     \[ f = abc + abc + ab\bar{c} + ab\bar{c} + abc + abc \]
     Les termes ajoutés ne changent pas la valeur de la fonction, et on peut simplifier en :
-    \[ f = bc + ac + ab \]
+    \[ f = abc + ab\bar{c} \]
 
     % Source : "Digital Design" by M. Morris Mano, 5th Edition, Pearson, 2013.
 
     \item \textbf{Règle 2} : Il est possible de supprimer un terme existant qui résulte de l'union de deux autres termes. Par exemple, si on a :
-    \[ f = ab + \bar{b}c + \bar{c} \]
+    \[ f = abc + ab\bar{c} = ab(c+\bar{c}) = ab \]
     On peut simplifier en utilisant les propriétés de l'algèbre booléenne.
 
     % Source : "Fundamentals of Digital Logic with Verilog Design" by Stephen Brown and Zvonko Vranesic, 3rd Edition, McGraw-Hill, 2013.
