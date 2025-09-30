@@ -1,0 +1,557 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\title{}
+\date{}
+\renewcommand{\contentsname}{Sommaire}
+\usepackage{setspace}
+\onehalfspacing
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+\section*{Introduction aux méthodes de clustering}
+
+\subsection*{Objectif des méthodes de clustering}
+
+Le \textbf{clustering}, ou classification non supervisée, vise à diviser un ensemble de données en plusieurs groupes (clusters, catégories, segments...) de sorte que les données similaires soient regroupées ensemble et les données dissemblables soient séparées. Ce processus est également appelé partitionnement ou segmentation.
+
+Les données sont structurées sous forme de tableau avec $n$ lignes et $p$ colonnes :
+\begin{itemize}
+    \item Chaque ligne représente une observation (ou un individu).
+    \item Chaque colonne représente une variable correspondant à une caractéristique (attribut, descripteur...) mesurée sur les observations.
+\end{itemize}
+
+\textbf{Exemples d'applications} dans divers domaines :
+\begin{itemize}
+    \item Fouille de données : catégorisation automatique de documents (emails, textes, photos, etc.).
+    \item Réseaux sociaux : détection de communautés.
+    \item Marketing : identification de types de profils clients.
+    \item Bioinformatique : regroupement de gènes similaires.
+    \item Segmentation d'images : identification de régions homogènes dans une image.
+\end{itemize}
+
+\textbf{Classification supervisée vs. non supervisée} :
+\begin{itemize}
+    \item \textbf{Supervisée} : Les classes sont connues à l'avance, et l'ensemble de données inclut des exemples étiquetés (paires (donnée, étiquette)). L'objectif est d'apprendre un modèle (à partir des données étiquetées) qui prédira la classe de nouvelles données non vues.
+    \item \textbf{Non supervisée (clustering)} : Les classes et leur nombre sont inconnus. L'objectif est de découvrir des groupes (clusters) directement à partir des caractéristiques des données.
+\end{itemize}
+
+% Ajout : Explication sur la différence entre les deux approches
+\textbf{Pourquoi cette distinction est-elle importante ?}
+La classification supervisée nécessite des données étiquetées, ce qui peut être coûteux et chronophage. Le clustering, en revanche, permet de découvrir des structures cachées dans les données sans connaissance préalable, ce qui est particulièrement utile pour l'exploration de données ou la segmentation de marché où les catégories ne sont pas définies à l'avance \cite{scikit-learn-clustering}.
+
+\subsection*{Formulation d'un problème de clustering}
+
+\textbf{Définition formelle} :
+\begin{itemize}
+    \item \textbf{Entrée} : Un ensemble de données $\mathcal{X}=\left\{\mathbf{x}_{1}, \cdots, \mathbf{x}_{\mathbf{i}}, \cdots, \mathbf{x}_{\mathbf{n}}\right\}$.
+    \item Chaque $\mathbf{x}_{\mathbf{i}}$ est un vecteur $\left[\begin{array}{llllll}x_{i}^{1} & \cdots & x_{i}^{j} & \cdots & x_{i}^{p}\end{array}\right]^{T}$ dans $\mathbb{R}^{p}$ représentant les $p$ caractéristiques d'une observation $i$.
+    \item \textbf{Sortie} : Une partition de $\mathcal{X}$ en $K$ clusters : $\mathcal{P}=\left\{\mathcal{C}_{1}, \mathcal{C}_{2}, \cdots, \mathcal{C}_{K}\right\}$.
+    \item \textbf{Objectif} : Trouver la meilleure partition $\mathcal{P}$ selon un critère donné.
+\end{itemize}
+
+\textbf{Rappel} : Une partition de $\mathcal{X}$ est une collection de sous-ensembles non vides, deux à deux disjoints, dont l'union est égale à $\mathcal{X}$.
+
+% Ajout : Explication sur la complexité combinatoire
+\textbf{Complexité combinatoire} :
+Le nombre de partitions possibles d'un ensemble de $n$ éléments en $k$ clusters est donné par le nombre de Stirling de deuxième espèce : $S(n, k)=\frac{1}{k!} \sum_{j=0}^{k}(-1)^{k-j} \mathrm{C}_{j}^{k} j^{n}$. Par exemple, $S(10,4)=34,105$. Le nombre total de partitions de $n$ éléments est donné par le nombre de Bell : $\mathcal{B}(n)=\sum_{k=1}^{n} S(n, k)$. Par exemple, $\mathcal{B}(10)$ est de l'ordre de 100 000. Cela rend l'optimisation exacte impossible pour des ensembles de données de taille moyenne ou grande \cite{wikipedia-clustering}.
+
+\subsection*{Principales approches de clustering}
+
+\textbf{Conséquence} : Il n'est pas possible d'optimiser le critère donné sur toutes les partitions possibles. On utilise donc des méthodes itératives qui explorent seulement un sous-ensemble de l'espace des solutions, espérant trouver une partition quasi-optimale.
+
+\textbf{Principes généraux} :
+\begin{itemize}
+    \item Commencer avec une partition initiale.
+    \item Améliorer itérativement la partition par rapport au critère en déplaçant les points de données d'un cluster à un autre.
+\end{itemize}
+
+\textbf{Trois grandes familles d'algorithmes de clustering} :
+\begin{itemize}
+    \item \textbf{Méthodes combinatoires} : Basées sur des considérations géométriques. L'objectif est de regrouper les points de données proches selon une mesure de similarité ou de dissimilarité (distance).
+    \item \textbf{Méthodes basées sur la densité} : Basées sur l'estimation de la densité locale des points de données. L'objectif est de regrouper les points de données situés dans des régions de haute densité (zones avec de nombreux points proches).
+    \item \textbf{Méthodes probabilistes} : Basées sur la modélisation statistique de la population à l'aide d'un mélange de distributions. L'objectif est de regrouper les points de données qui sont probablement tirés de la même distribution de probabilité.
+\end{itemize}
+
+% Ajout : Explication sur les limites des méthodes combinatoires et l'intérêt des méthodes basées sur la densité
+\textbf{Limites des méthodes combinatoires} :
+Les méthodes combinatoires (comme K-means) supposent implicitement que les clusters sont de forme convexe (sphères, ellipsoïdes) et peuvent échouer à détecter des clusters de formes arbitraires ou imbriqués. Les méthodes basées sur la densité, comme DBSCAN, permettent de détecter des clusters de formes complexes et de gérer le bruit et les valeurs aberrantes \cite{scikit-learn-dbscan, wikipedia-dbscan}.
+
+\section*{Données}
+
+\subsection*{Observations et variables}
+
+En pratique, les données sont généralement organisées dans un tableau de $n$ lignes et $p$ colonnes, c'est-à-dire une matrice $\mathbf{X}$ de taille $(n, p)$ :
+\begin{itemize}
+    \item Chaque ligne correspond à une observation $i$, représentée par un vecteur $\mathbf{x}_{\mathbf{i}} \in \mathbb{R}^{p}$.
+    \item Chaque colonne correspond à une variable $j$, représentée par un vecteur $\mathbf{x}^{\mathbf{j}} \in \mathbb{R}^{n}$.
+\end{itemize}
+
+\textbf{Types de variables} :
+\begin{itemize}
+    \item \textbf{Variables qualitatives (catégorielles)} : Doivent être transformées en variables numériques.
+    \begin{itemize}
+        \item \textbf{Label encoding} : Assigne une valeur entière spécifique à chaque catégorie (ex: $0=$ Faible, $1=$ Moyen, $2=$ Élevé). Idéal pour les données ordinales où les catégories ont un ordre naturel.
+        \item \textbf{One hot encoding} : Génère une nouvelle caractéristique binaire pour chaque catégorie. Idéal pour les données nominales sans ordre entre les catégories (comme les couleurs, les pays...), mais le nombre de catégories doit être faible.
+    \end{itemize}
+    \item \textbf{Variables quantitatives} : Sont standardisées pour garantir que toutes les variables aient le même poids dans les algorithmes de clustering.
+\end{itemize}
+
+% Ajout : Explication sur la standardisation et son importance
+\textbf{Standardisation} :
+La standardisation consiste à transformer les variables pour qu'elles aient une moyenne nulle et un écart-type unitaire. Cela est crucial pour les algorithmes basés sur la distance (comme K-means), car sinon, les variables avec une plus grande échelle domineront le calcul des distances \cite{scikit-learn-preprocessing}.
+
+\subsection*{Distance entre chaque paire d'observations}
+
+Pour partitionner un ensemble de points, il faut pouvoir mesurer la similarité ou la dissimilarité entre les points. Cela nécessite de définir une distance entre chaque paire d'observations $x_i$ et $x_j$.
+
+\textbf{Propriétés d'une distance} :
+\begin{itemize}
+    \item \textbf{Symétrie} : $d(x_i, x_j) = d(x_j, x_i)$.
+    \item \textbf{Séparation} : $d(x_i, x_j) \geq 0$ et $d(x_i, x_j) = 0$ si $i = j$.
+    \item \textbf{Inégalité triangulaire} : $d(x_i, x_j) \leq d(x_i, x_k) + d(x_k, x_j)$.
+\end{itemize}
+
+\textbf{Choix de la distance} : Il dépend de la nature des données.
+
+\textbf{Cas des données quantitatives réelles} :
+\begin{itemize}
+    \item \textbf{Distance de Minkowski} (norme $L_q$) :
+    $$d\left(\mathbf{x}_i, \mathbf{x}_l\right) = \left\|\mathbf{x}_i - \mathbf{x}_l\right\|_q = \left(\sum_{j=1}^{p} \left| x_{i}^{j} - x_{l}^{j} \right|^q\right)^{\frac{1}{q}}$$
+    \begin{itemize}
+        \item \textbf{Distance euclidienne} ($q = 2$) : La plus couramment utilisée.
+        $$d\left(\mathbf{x}_i, \mathbf{x}_l\right) = \left\|\mathbf{x}_i - \mathbf{x}_l\right\|_2 = \sqrt{\sum_{j=1}^{p} \left(x_{i}^{j} - x_{l}^{j}\right)^2} = \sqrt{\left(\mathbf{x}_i - \mathbf{x}_l\right)^T \left(\mathbf{x}_i - \mathbf{x}_l\right)}$$
+        \item \textbf{Distance de Manhattan} ($q = 1$) :
+        $$d(\mathbf{x}_i, \mathbf{x}_l) = \left\| \mathbf{x}_i - \mathbf{x}_l \right\|_1 = \sum_{j=1}^{p} \left| x_i^j - x_l^j \right|$$
+        \item \textbf{Distance de Chebyshev} ($q = \infty$) :
+        $$d(\mathbf{x}_i, \mathbf{x}_l) = \left\| \mathbf{x}_i - \mathbf{x}_l \right\|_{\infty} = \sup_{1 \leq j \leq p} \left| x_i^j - x_l^j \right|$$
+    \end{itemize}
+\end{itemize}
+
+% Ajout : Explication sur la distance de Mahalanobis et son utilité
+\textbf{Distance de Mahalanobis} :
+La distance de Mahalanobis est définie à partir d'une matrice $\mathbf{M}$ symétrique définie positive :
+$$d_M(\mathbf{x}_i, \mathbf{x}_l) = \left\| \mathbf{x}_i - \mathbf{x}_l \right\|_{M} = \sqrt{(\mathbf{x}_i - \mathbf{x}_l)^T \mathbf{M}(\mathbf{x}_i - \mathbf{x}_l)}.$$
+\begin{itemize}
+    \item Si $\mathbf{M} = \mathbf{V}^{-1}$, où $\mathbf{V}$ est la matrice de covariance des variables, on obtient la distance de Mahalanobis.
+    \item Cette distance prend en compte la covariance entre les variables, ce qui la rend particulièrement utile lorsque les variables sont corrélées ou ont des échelles différentes \cite{mahalanobis-wikipedia, mahalanobis-machinelearningplus}.
+\end{itemize}
+
+\textbf{Cas des données discrètes quantitatives} :
+\begin{itemize}
+    \item \textbf{Distance de Hamming} : Nombre d'éléments différents entre deux vecteurs.
+    \item \textbf{Indices de similarité} : Basés sur les quantités $a_{il}$ (nombre d'éléments communs), $b_{il}$ (nombre d'éléments dans $x_i$ mais pas dans $x_l$), $c_{il}$ (nombre d'éléments dans $x_l$ mais pas dans $x_i$), $d_{il}$ (nombre d'éléments ni dans $x_i$ ni dans $x_l$).
+    \begin{itemize}
+        \item \textbf{Coefficient de simple matching} : $d(x_i, x_l) = \frac{a_{il} + d_{il}}{p}$
+        \item \textbf{Indice de Jaccard} : $d(x_i, x_l) = \frac{a_{il}}{a_{il} + b_{il} + c_{il}}$
+    \end{itemize}
+\end{itemize}
+
+% Ajout : Explication sur la distance de Levenshtein
+\textbf{Distance de Levenshtein} :
+Nombre d'opérations élémentaires (insertion/suppression/remplacement) nécessaires pour transformer une chaîne de caractères source en une chaîne cible. Par exemple, $d("a", "ab") = 1$ (insertion de "b") \cite{levenshtein-wikipedia}.
+
+\subsection*{Caractéristiques géométriques du nuage d'observations}
+
+Le nuage d'observations est caractérisé par son centre de gravité, sa matrice de covariance et son inertie.
+
+\textbf{Centre de gravité} :
+Le centre $\mathbf{g}$ du nuage d'observations est le vecteur moyen des observations :
+$$\mathbf{g}=\frac{1}{n} \sum_{i=1}^{n} \mathbf{x}_{\mathbf{i}}=\left[\begin{array}{c}
+\bar{x}^{1} \\
+\bar{x}^{2} \\
+\vdots \\
+\bar{x}^{p}
+\end{array}\right]$$
+\begin{itemize}
+    \item $\mathbf{g}$ représente une observation moyenne de la population.
+    \item Chaque composante est la valeur moyenne de la variable $j$ sur toutes les $n$ observations : $\bar{x}^{j}=\frac{1}{n} \sum_{i=1}^{n} x_{i}^{j}$.
+\end{itemize}
+
+\textbf{Matrice de covariance} :
+La matrice de covariance $\mathbf{V}$ est définie (à un facteur $\frac{1}{n}$ près) par :
+$$\mathbf{V}=\sum_{i=1}^{n}\left(\mathbf{x}_{\mathbf{i}}-\mathbf{g}\right)\left(\mathbf{x}_{\mathbf{i}}-\mathbf{g}\right)^{T}$$
+\begin{itemize}
+    \item $\mathbf{V}$ capture la dispersion de chaque variable et les relations entre les variables.
+    \item Les éléments diagonaux $V_{jj}$ représentent la variance de la variable $j$ : $V_{jj}=\operatorname{var}\left(\mathbf{x}^{\mathbf{j}}\right)=\sum_{i=1}^{n}\left(x_{i}^{j}-\bar{x}^{j}\right)^{2}$.
+    \item Les éléments hors diagonale $V_{jk}$ représentent la covariance entre les variables $j$ et $k \neq j$ : $V_{jk}=\operatorname{cov}\left(\mathbf{x}^{\mathbf{j}}, \mathbf{x}^{\mathbf{k}}\right)=\sum_{i=1}^{n}\left(x_{i}^{j}-\bar{x}^{j}\right)\left(x_{i}^{k}-\bar{x}^{k}\right)$.
+\end{itemize}
+
+\textbf{Inertie totale du nuage d'observations} :
+L'inertie totale du nuage d'observations est définie (à un facteur $\frac{1}{n}$ près) comme la somme des distances au carré entre les points et le centre de gravité :
+$$I=\sum_{i=1}^{n} d^{2}\left(\mathbf{x}_{\mathbf{i}}, \mathbf{g}\right)=\sum_{i=1}^{n}\left\|\mathbf{x}_{\mathbf{i}}-\mathbf{g}\right\|^{2}$$
+\begin{itemize}
+    \item L'inertie correspond à la généralisation de la variance au cas multivarié ; elle mesure la dispersion globale du nuage d'observations autour de son centre de gravité dans l'espace à $p$ dimensions.
+    \item Avec ces définitions, l'inertie est la trace de la matrice de covariance :
+    $$I = \sum_{i=1}^{n}\left\|\mathbf{x}_{\mathbf{i}}-\mathbf{g}\right\|^{2} = \sum_{j=1}^{p} V_{jj} = \operatorname{trace}(\mathbf{V})$$
+\end{itemize}
+
+% Commentaire : Il serait utile d'ajouter des images pour illustrer les concepts de centre de gravité, de matrice de covariance et d'inertie.
+
+\includegraphics[scale=0.5]{inertie}
+
+\section*{Méthodes combinatoires}
+
+\subsection*{Principe des méthodes combinatoires}
+
+Les méthodes combinatoires cherchent à trouver la partition $\mathcal{P}$ de l'ensemble de données $\mathcal{X}$ en $K$ clusters $\left\{\mathcal{C}_{1}, \mathcal{C}_{2}, \cdots, \mathcal{C}_{K}\right\}$ qui minimise une fonction de coût définie à partir d'un critère de similarité/dissimilarité sur $\mathcal{X}$.
+
+\textbf{Objectifs} :
+\begin{itemize}
+    \item Les observations les plus similaires sont assignées au même cluster.
+    \item Les observations dissemblables sont placées dans des clusters distincts.
+    \item Il n'y a pas de référence à un modèle probabiliste sous-jacent décrivant les données (contrairement aux méthodes probabilistes).
+\end{itemize}
+
+\subsection*{Caractéristiques géométriques d'un cluster}
+
+Comme pour l'ensemble du nuage d'observations, chaque cluster peut être caractérisé par son centre, sa matrice de covariance et son inertie.
+
+\textbf{Centre d'un cluster} :
+Le centre $\mathbf{g}_k$ d'un cluster $\mathcal{C}_k$ de cardinalité $n_k = |\mathcal{C}_k|$ est défini comme le vecteur moyen des observations du cluster :
+$$\mathbf{g}_k = \frac{1}{n_k} \sum_{\mathbf{x}_i \in \mathcal{C}_k} \mathbf{x}_i$$
+
+\textbf{Matrice de covariance d'un cluster} :
+La matrice de covariance $\mathbf{V}_k$ d'un cluster $\mathcal{C}_k$ de centre $\mathbf{g}_k$ est définie par :
+$$\mathbf{V}_k = \sum_{\mathbf{x}_i \in \mathcal{C}_k} (\mathbf{x}_i - \mathbf{g}_k)(\mathbf{x}_i - \mathbf{g}_k)^T$$
+
+\textbf{Inertie d'un cluster} :
+L'inertie d'un cluster $\mathcal{C}_k$ est définie comme la somme des distances au carré entre les points du cluster et son centre $\mathbf{g}_k$ :
+$$I_k = \sum_{\mathbf{x}_i \in \mathcal{C}_k} d^2(\mathbf{x}_i, \mathbf{g}_k) = \sum_{\mathbf{x}_i \in \mathcal{C}_k} \|\mathbf{x}_i - \mathbf{g}_k\|^2$$
+L'inertie peut aussi être obtenue à partir de la matrice de covariance :
+$$I_k = \text{trace}(\mathbf{V}_k)$$
+
+\subsection*{Critère à optimiser}
+
+\textbf{Décomposition de l'inertie totale du nuage d'observations} :
+Soit un nuage de centre $\mathbf{g}$ composé de $n$ observations $\mathbf{x}_i$ réparties en $K$ clusters $\mathcal{C}_1, \cdots, \mathcal{C}_K$. Chaque cluster $\mathcal{C}_k$ de centre $\mathbf{g}_k$ contient $n_k$ observations.
+
+L'inertie totale peut être décomposée comme suit :
+$$
+\begin{aligned}
+I &= \sum_{i=1}^{n}\|\mathbf{x}_i - \mathbf{g}\|^2 = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} \|\mathbf{x}_i - \mathbf{g}\|^2 \\
+&= \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} \|\mathbf{x}_i - \mathbf{g}_k + \mathbf{g}_k - \mathbf{g}\|^2 \\
+&= \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} \|\mathbf{x}_i - \mathbf{g}_k\|^2 + \|\mathbf{g}_k - \mathbf{g}\|^2 \\
+&= \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} d^2(\mathbf{x}_i, \mathbf{g}_k) + \sum_{k=1}^{K} n_k d^2(\mathbf{g}_k, \mathbf{g})
+\end{aligned}
+$$
+
+\textbf{Inertie totale = Inertie intra-cluster + Inertie inter-cluster} :
+$$I = I_W + I_B$$
+\begin{itemize}
+    \item $I_W = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} d^2(\mathbf{x}_i, \mathbf{g}_k)$ est l'inertie intra-cluster. Elle représente la dispersion de tous les clusters. À minimiser pour obtenir des clusters aussi homogènes que possible.
+    \item $I_B = \sum_{k=1}^{K} n_k d^2(\mathbf{g}_k, \mathbf{g})$ est l'inertie inter-cluster. Elle représente la séparation entre les clusters. À maximiser pour obtenir des clusters bien séparés.
+\end{itemize}
+
+\textbf{Conséquence} : Minimiser $I_W$ est équivalent à maximiser $I_B$.
+
+\textbf{Formulation du problème d'optimisation} :
+Pour un nombre de clusters $K$ donné, l'objectif est de trouver la partition $\mathcal{P} = \{\mathcal{C}_1, \mathcal{C}_2, \cdots, \mathcal{C}_K\}$ qui minimise l'inertie intra-cluster :
+$$I_W = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} d^2(\mathbf{x}_i, \mathbf{g}_k)$$
+
+\subsection*{Algorithme K-means}
+
+\textbf{Principe} :
+K-means est un algorithme itératif de descente qui résout un problème d'optimisation élargi : il cherche à la fois les clusters $\{\mathcal{C}_1, \mathcal{C}_2, \cdots, \mathcal{C}_K\}$ et leurs centres $\{\mathbf{g}_1, \mathbf{g}_2, \cdots, \mathbf{g}_K\}$ qui minimisent l'inertie intra-cluster $I_W$.
+
+\textbf{Étapes de l'algorithme} :
+\begin{enumerate}
+    \item Initialiser les centres $\mathbf{g}_1, \mathbf{g}_2, \cdots, \mathbf{g}_K$ des $K$ clusters.
+    \item Répéter :
+    \begin{itemize}
+        \item Créer une nouvelle partition en assignant chaque point $\mathbf{x}_i$ au cluster dont le centre est le plus proche.
+        \item Mettre à jour le centre de chaque cluster $\mathcal{C}_k$ en calculant la moyenne des points qui lui sont assignés :
+        $$\mathbf{g}_k = \frac{1}{n_k} \sum_{\mathbf{x}_i \in \mathcal{C}_k} \mathbf{x}_i$$
+    \end{itemize}
+    \item Jusqu'à convergence (plus de changement dans l'assignation des points ou inertie intra-cluster minimale).
+\end{enumerate}
+
+\textbf{Initialisation} :
+\begin{itemize}
+    \item Le nombre de clusters $K$ est choisi a priori.
+    \item Les $K$ centres sont tirés aléatoirement ou de manière plus intelligente (par exemple, avec K-means++ pour éviter les clusters vides ou trop proches).
+\end{itemize}
+
+\textbf{Critère d'arrêt} :
+\begin{itemize}
+    \item Nombre maximal d'itérations atteint.
+    \item Convergence : soit la partition est stable (plus de changement dans l'assignation des observations aux clusters), soit l'inertie intra-cluster a atteint son minimum.
+\end{itemize}
+
+\textbf{Propriétés de K-means} :
+\begin{itemize}
+    \item Convergence garantie en un nombre fini d'étapes, mais seulement vers un minimum local de l'inertie.
+    \item Faible complexité computationnelle : $\mathcal{O}(n K N)$, où $N$ est le nombre d'itérations. Cela permet de traiter de grands ensembles de données.
+    \item Facile à interpréter.
+    \item Le nombre de clusters $K$ est fixé a priori.
+    \item Sensible à l'initialisation, qui impacte fortement le résultat. En pratique, l'algorithme est exécuté plusieurs fois avec des initialisations différentes, et la meilleure partition (selon l'inertie intra-cluster) est conservée.
+    \item Adapté aux clusters convexes (sphères, ellipsoïdes) de taille équilibrée.
+\end{itemize}
+
+% Ajout : Limites de K-means
+\textbf{Limites de K-means} :
+\begin{itemize}
+    \item \textbf{Sensibilité aux valeurs aberrantes} : Les points éloignés peuvent fausser la position des centroïdes.
+    \item \textbf{Forme des clusters} : K-means suppose des clusters sphériques et peut mal performer sur des clusters de formes arbitraires ou de tailles très différentes.
+    \item \textbf{Choix de $K$} : Le nombre de clusters doit être connu à l'avance, ce qui n'est pas toujours possible en pratique. Des méthodes comme l'elbow method ou le silhouette score sont souvent utilisées pour estimer $K$ \cite{kmeans-wikipedia, kmeans-towardsdatascience}.
+\end{itemize}
+
+\subsection*{Clustering hiérarchique agglomératif}
+
+\textbf{Principe} :
+Les méthodes hiérarchiques produisent itérativement une hiérarchie de partitions imbriquées qui minimisent l'inertie intra-cluster. Il existe deux approches :
+\begin{itemize}
+    \item \textbf{Agglomérative (bottom-up)} : Commence avec chaque observation dans son propre cluster. Fusionne itérativement les deux clusters les plus proches jusqu'à obtenir un seul cluster contenant toutes les données.
+    \item \textbf{Divisive (top-down)} : Commence avec toutes les données dans un seul cluster. Divise itérativement les clusters jusqu'à ce que chaque observation soit dans son propre cluster. Moins utilisée, car le nombre de divisions possibles est plus grand que le nombre de fusions.
+\end{itemize}
+
+\textbf{Algorithme du clustering hiérarchique agglomératif (AHC)} :
+\begin{enumerate}
+    \item Initialisation : Créer $n$ clusters, chacun contenant une seule observation. Calculer la matrice des distances $\mathbf{M}$ entre toutes les paires de clusters.
+    \item Répéter :
+    \begin{itemize}
+        \item Sélectionner dans $\mathbf{M}$ les 2 clusters $\mathcal{C}_k$ et $\mathcal{C}_m$ les plus proches selon une distance inter-clusters.
+        \item Fusionner $\mathcal{C}_k$ et $\mathcal{C}_m$ en un nouveau cluster $\mathcal{C}_a$.
+        \item Mettre à jour $\mathbf{M}$ avec les distances entre $\mathcal{C}_a$ et tous les autres clusters.
+    \end{itemize}
+    \item Jusqu'à ce que les 2 derniers clusters soient fusionnés.
+\end{enumerate}
+
+\textbf{Distances (ou critères de liaison) entre 2 clusters $\mathcal{C}_k$ et $\mathcal{C}_m$} :
+\begin{itemize}
+    \item \textbf{Single linkage} : Distance minimale entre deux points des clusters.
+    $$d_{\text{min}}(\mathcal{C}_k, \mathcal{C}_m) = \min_{\mathbf{x}_i \in \mathcal{C}_k, \mathbf{x}_l \in \mathcal{C}_m} d(\mathbf{x}_i, \mathbf{x}_l)$$
+    \begin{itemize}
+        \item Tendance à produire des clusters larges.
+        \item Sensible au bruit et aux valeurs aberrantes.
+    \end{itemize}
+    \item \textbf{Complete linkage} : Distance maximale entre deux points des clusters.
+    $$d_{\text{max}}(\mathcal{C}_k, \mathcal{C}_m) = \max_{\mathbf{x}_i \in \mathcal{C}_k, \mathbf{x}_l \in \mathcal{C}_m} d(\mathbf{x}_i, \mathbf{x}_l)$$
+    \begin{itemize}
+        \item Tendance à produire des clusters compacts.
+        \item Sensible aux valeurs aberrantes.
+    \end{itemize}
+    \item \textbf{Average linkage} : Distance moyenne entre tous les paires de points des clusters.
+    $$d_{\text{avg}}(\mathcal{C}_k, \mathcal{C}_m) = \frac{\sum_{\mathbf{x}_i \in \mathcal{C}_k} \sum_{\mathbf{x}_l \in \mathcal{C}_m} d(\mathbf{x}_i, \mathbf{x}_l)}{n_k n_m}$$
+    \begin{itemize}
+        \item Tendance à produire des clusters plus homogènes.
+        \item Moins sensible aux valeurs aberrantes.
+    \end{itemize}
+    \item \textbf{Centroid linkage} : Distance entre les centres des clusters.
+    $$d_{\text{cg}}(\mathcal{C}_k, \mathcal{C}_m) = d(\mathbf{g}_k, \mathbf{g}_m)$$
+    \begin{itemize}
+        \item Moins sensible aux valeurs aberrantes.
+    \end{itemize}
+    \item \textbf{Méthode de Ward} : Fusionne les deux clusters qui minimisent l'augmentation de l'inertie intra-cluster.
+    $$d_{\text{Ward}}(\mathcal{C}_k, \mathcal{C}_m) = \sqrt{\frac{n_k n_m}{n_k + n_m}} d(\mathbf{g}_k, \mathbf{g}_m)$$
+    \begin{itemize}
+        \item Minimise la perte en inertie inter-cluster.
+        \item Tendance à produire des clusters de taille similaire.
+    \end{itemize}
+\end{itemize}
+
+\textbf{Dendrogramme} :
+Le dendrogramme est une représentation visuelle de la hiérarchie des clusters. Il permet de :
+\begin{itemize}
+    \item Visualiser l'ordre de fusion des clusters.
+    \item Choisir le nombre de clusters en "coupant" l'arbre à une certaine hauteur.
+    \item Identifier les clusters naturels : les branches courtes indiquent des fusions de clusters similaires, tandis que les branches longues indiquent des fusions de clusters moins homogènes.
+\end{itemize}
+
+\textbf{Propriétés du clustering hiérarchique agglomératif} :
+\begin{itemize}
+    \item Le nombre de clusters $K$ n'est pas requis à l'avance.
+    \item Résultat sous forme de dendrogramme visuel.
+    \item Algorithme entièrement déterministe (pas de réévaluation des clusters fusionnés).
+    \item Complexité computationnelle élevée : au moins $n^2$ (calcul des distances à la première itération).
+    \item Sensible au bruit (selon le critère de liaison).
+\end{itemize}
+
+% Ajout : Comparaison K-means et AHC
+\textbf{Comparaison K-means et AHC} :
+\begin{table}[h]
+\centering
+<custom-element data-json="%7B%22type%22%3A%22table-metadata%22%2C%22attributes%22%3A%7B%22title%22%3A%22Comparaison%20K-means%20et%20AHC%22%7D%7D" />
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Critère} & \textbf{K-means} & \textbf{AHC} \\ \hline
+Complexité & Faible : $\mathcal{O}(n K N)$ & Élevée : $\mathcal{O}(n^3)$ \\ \hline
+Interprétation & Facile & Visuelle (dendrogramme) \\ \hline
+Nombre de clusters & Doit être fixé a priori & Pas besoin de fixer $K$ a priori \\ \hline
+Sensibilité à l'initialisation & Oui & Non \\ \hline
+Forme des clusters & Convexe & Arbitraire (selon le critère de liaison) \\ \hline
+Sensibilité au bruit & Oui & Dépend du critère de liaison \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection*{Choix du nombre de clusters $K$}
+
+\textbf{Méthode du coude (Elbow method)} :
+\begin{itemize}
+    \item Tracer l'inertie intra-cluster $I_W$ en fonction de $K$ (courbe décroissante).
+    \item Rechercher le "coude" où la courbe commence à s'aplatir, c'est-à-dire où l'ajout de clusters supplémentaires ne réduit pas significativement $I_W$.
+    \item Ce point est considéré comme le nombre optimal de clusters.
+\end{itemize}
+
+\textbf{Méthode de la silhouette} :
+\begin{itemize}
+    \item Le score de silhouette mesure la cohésion (similarité intra-cluster) et la séparation (dissimilarité inter-cluster).
+    \item Tracer le score de silhouette en fonction de $K$.
+    \item Rechercher la valeur maximale, qui indique le nombre optimal de clusters, reflétant le plus haut degré de cohésion et de séparation.
+\end{itemize}
+
+\textbf{Méthode contextuelle} :
+\begin{itemize}
+    \item Choisir un nombre de clusters pour lequel les clusters peuvent être interprétés de manière significative dans le contexte de l'application.
+\end{itemize}
+
+% Ajout : Exemple visuel des méthodes de choix de K
+\textbf{Exemple visuel} :
+Il est souvent utile de combiner les méthodes du coude et de la silhouette pour valider le choix de $K$. Par exemple, si la méthode du coude suggère $K=3$ et que le score de silhouette est maximal pour $K=3$, cela renforce la confiance dans ce choix \cite{elbow-silhouette-datacamp, elbow-silhouette-kdnuggets}.
+
+\section*{Méthodes basées sur la densité}
+
+\subsection*{Limitations des méthodes précédentes}
+
+Les méthodes combinatoires (comme K-means et le clustering hiérarchique) ont des limites :
+\begin{itemize}
+    \item Elles ne peuvent pas trouver des clusters de formes arbitraires et de tailles variées (par exemple, des cercles imbriqués).
+    \item Elles supposent implicitement que les clusters sont de forme convexe (sphères, ellipsoïdes).
+\end{itemize}
+
+% Ajout : Illustration des limites
+\textbf{Exemple visuel} :
+Les méthodes comme K-means et le clustering hiérarchique (avec la méthode de Ward) échouent souvent à détecter des clusters de formes non convexes, comme des cercles concentriques ou des spirales. DBSCAN, en revanche, est conçu pour gérer ces cas \cite{dbscan-scikit-learn, dbscan-wikipedia}.
+
+\subsection*{Méthodes de clustering basées sur la densité}
+
+\textbf{Solution} : Les méthodes de clustering basées sur la densité, comme DBSCAN (Density-Based Spatial Clustering of Applications with Noise), permettent de former des clusters de formes non convexes.
+
+\textbf{Approche} :
+\begin{itemize}
+    \item Hypothèse : Les clusters correspondent à des régions de haute densité (contenant beaucoup d'observations).
+    \item Principe : Estimer la densité de la région autour de chaque observation et étendre les clusters à partir des observations situées dans des régions de haute densité.
+    \item Avantages : Détection de clusters de formes arbitraires et identification des valeurs aberrantes comme du bruit.
+\end{itemize}
+
+\subsection*{Définitions}
+
+\textbf{$\epsilon$-voisinage} :
+Soit $\epsilon$ un nombre réel positif. Le $\epsilon$-voisinage d'un point $\mathbf{x}_i$ dans un ensemble de données $\mathcal{X}$ est le sous-ensemble $\mathcal{V}_{\epsilon}(\mathbf{x}_i)$ tel que :
+$$\mathcal{V}_{\epsilon}(\mathbf{x}_i) = \{\mathbf{x}_l \in \mathcal{X} ; d(\mathbf{x}_i, \mathbf{x}_l) < \epsilon\}$$
+
+\textbf{Types de points} :
+\begin{itemize}
+    \item \textbf{Point central (core point)} : Un point $\mathbf{x}_i$ situé dans une région de haute densité. Son $\epsilon$-voisinage contient au moins un nombre seuil de points $n_{\text{min}}$ :
+    $$|\mathcal{V}_{\epsilon}(\mathbf{x}_i)| \geq n_{\text{min}}$$
+    \item \textbf{Point frontière (border point)} : Un point $\mathbf{x}_i$ situé à la frontière d'une région de haute densité. Il appartient au $\epsilon$-voisinage d'un point central, mais n'est pas lui-même un point central.
+    \item \textbf{Point de bruit (noise/outlier point)} : Un point isolé, ni central ni frontière.
+\end{itemize}
+
+\textbf{Accessibilité par la densité} :
+Un point $\mathbf{x}_i$ est accessible par la densité depuis un point $\mathbf{x}_l$ s'il existe une séquence de $\epsilon$-voisinages, chacun contenant au moins $n_{\text{min}}$ points, les reliant.
+
+\subsection*{Algorithme DBSCAN}
+
+\textbf{Principe} :
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise) est un algorithme de clustering basé sur la densité. Il regroupe les points proches et marque les points isolés comme du bruit.
+
+\textbf{Étapes} :
+\begin{enumerate}
+    \item Pour chaque point $\mathbf{x}_i$, calculer son $\epsilon$-voisinage $\mathcal{V}_{\epsilon}(\mathbf{x}_i)$.
+    \item Si $|\mathcal{V}_{\epsilon}(\mathbf{x}_i)| \geq n_{\text{min}}$, $\mathbf{x}_i$ est un point central.
+    \item Étendre le cluster en ajoutant tous les points accessibles par la densité depuis $\mathbf{x}_i$.
+    \item Répéter jusqu'à ce que tous les points soient visités.
+\end{enumerate}
+
+\textbf{Paramètres} :
+\begin{itemize}
+    \item $\epsilon$ : Rayon du voisinage.
+    \item $n_{\text{min}}$ : Nombre minimal de points pour former un cluster.
+\end{itemize}
+
+\textbf{Avantages} :
+\begin{itemize}
+    \item Pas besoin de spécifier le nombre de clusters a priori.
+    \item Capable de détecter des clusters de formes arbitraires.
+    \item Robuste aux valeurs aberrantes.
+\end{itemize}
+
+\textbf{Limites} :
+\begin{itemize}
+    \item Sensible au choix des paramètres $\epsilon$ et $n_{\text{min}}$.
+    \item Peut mal performer si les densités des clusters varient fortement.
+\end{itemize}
+
+% Ajout : Exemple visuel de DBSCAN
+\textbf{Exemple visuel} :
+DBSCAN est particulièrement efficace pour des données avec des clusters de formes complexes et du bruit. Par exemple, il peut détecter des clusters en forme de cercle ou de spirale, là où K-means échoue \cite{dbscan-datacamp, dbscan-kdnuggets}.
+
+\section*{Métriques de performance en clustering}
+
+\subsection*{Introduction}
+
+Évaluer la qualité d'un clustering est essentiel pour choisir le bon algorithme et les bons paramètres. Plusieurs métriques existent, selon que l'on dispose ou non d'étiquettes de référence.
+
+\subsection*{Métriques internes}
+
+\textbf{Inertie intra-cluster} :
+$$I_W = \sum_{k=1}^{K} \sum_{\mathbf{x}_i \in \mathcal{C}_k} d^2(\mathbf{x}_i, \mathbf{g}_k)$$
+\begin{itemize}
+    \item Mesure la compacité des clusters.
+    \item À minimiser.
+\end{itemize}
+
+\textbf{Score de silhouette} :
+Pour un point $\mathbf{x}_i$, le score de silhouette $s(\mathbf{x}_i)$ est défini comme :
+$$s(\mathbf{x}_i) = \frac{b(\mathbf{x}_i) - a(\mathbf{x}_i)}{\max(a(\mathbf{x}_i), b(\mathbf{x}_i))}$$
+où :
+\begin{itemize}
+    \item $a(\mathbf{x}_i)$ : Distance moyenne entre $\mathbf{x}_i$ et les autres points de son cluster.
+    \item $b(\mathbf{x}_i)$ : Distance moyenne entre $\mathbf{x}_i$ et les points du cluster le plus proche.
+\end{itemize}
+\begin{itemize}
+    \item Le score varie entre $-1$ et $1$.
+    \item Un score proche de $1$ indique que $\mathbf{x}_i$ est bien clusterisé.
+    \item Un score proche de $-1$ indique que $\mathbf{x}_i$ est mal clusterisé.
+\end{itemize}
+
+\subsection*{Métriques externes}
+
+\textbf{Précision, rappel, et F1-score} :
+Si des étiquettes de référence sont disponibles, on peut calculer :
+\begin{itemize}
+    \item La précision : proportion de paires de points du même cluster qui sont aussi dans la même classe de référence.
+    \item Le rappel : proportion de paires de points de la même classe de référence qui sont aussi dans le même cluster.
+    \item Le F1-score : moyenne harmonique de la précision et du rappel.
+\end{itemize}
+
+\textbf{Indice de Rand ajusté} :
+Mesure la similarité entre la partition obtenue et la partition de référence, en tenant compte du hasard.
+
+\subsection*{Choix du nombre de clusters}
+
+\textbf{Méthode du coude} :
+\begin{itemize}
+    \item Tracer $I_W$ en fonction de $K$.
+    \item Choisir $K$ au "coude" de la courbe.
+\end{itemize}
+
+\textbf{Méthode de la silhouette} :
+\begin{itemize}
+    \item Tracer le score de silhouette moyen en fonction de $K$.
+    \item Choisir $K$ qui maximise le score.
+\end{itemize}
+
+% Ajout : Exemple de choix de K
+\textbf{Exemple} :
+Pour un jeu de données donné, si la méthode du coude suggère $K=3$ et que le score de silhouette est maximal pour $K=3$, cela renforce la confiance dans ce choix. En pratique, il est souvent utile de combiner plusieurs méthodes pour valider le nombre optimal de clusters \cite{elbow-silhouette-datacamp, elbow-silhouette-kdnuggets}.
+
+
+\end{document}
