@@ -135,8 +135,9 @@ Pour partitionner un ensemble de points, il faut pouvoir mesurer la similarité 
 \end{itemize}
 
 % Ajout : Explication sur la distance de Mahalanobis et son utilité
-\textbf{Distance de Mahalanobis} :
-La distance de Mahalanobis est définie à partir d'une matrice $\mathbf{M}$ symétrique définie positive :
+\textbf{Distance par utilisation du produit scalaire} 
+
+On pose une matrice $\mathbf{M}$ symétrique définie positive :
 $$d_M(\mathbf{x}_i, \mathbf{x}_l) = \left\| \mathbf{x}_i - \mathbf{x}_l \right\|_{M} = \sqrt{(\mathbf{x}_i - \mathbf{x}_l)^T \mathbf{M}(\mathbf{x}_i - \mathbf{x}_l)}.$$
 \begin{itemize}
     \item Si $\mathbf{M} = \mathbf{V}^{-1}$, où $\mathbf{V}$ est la matrice de covariance des variables, on obtient la distance de Mahalanobis.
@@ -364,6 +365,8 @@ Le dendrogramme est une représentation visuelle de la hiérarchie des clusters.
     \item Identifier les clusters naturels : les branches courtes indiquent des fusions de clusters similaires, tandis que les branches longues indiquent des fusions de clusters moins homogènes.
 \end{itemize}
 
+\includegraphics[scale=0.5]{dendogramme}
+
 \textbf{Propriétés du clustering hiérarchique agglomératif} :
 \begin{itemize}
     \item Le nombre de clusters $K$ n'est pas requis à l'avance.
@@ -377,7 +380,6 @@ Le dendrogramme est une représentation visuelle de la hiérarchie des clusters.
 \textbf{Comparaison K-means et AHC} :
 \begin{table}[h]
 \centering
-<custom-element data-json="%7B%22type%22%3A%22table-metadata%22%2C%22attributes%22%3A%7B%22title%22%3A%22Comparaison%20K-means%20et%20AHC%22%7D%7D" />
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Critère} & \textbf{K-means} & \textbf{AHC} \\ \hline
@@ -492,6 +494,10 @@ DBSCAN (Density-Based Spatial Clustering of Applications with Noise) est un algo
 % Ajout : Exemple visuel de DBSCAN
 \textbf{Exemple visuel} :
 DBSCAN est particulièrement efficace pour des données avec des clusters de formes complexes et du bruit. Par exemple, il peut détecter des clusters en forme de cercle ou de spirale, là où K-means échoue \cite{dbscan-datacamp, dbscan-kdnuggets}.
+
+\textbf{Choix de $n_{min}$ et $\epsilon$}
+
+En règle général, on prend $n_{min} = 2p$. Pour choisir $\epsilon$, on regarde pour chaque point la distance du $n_{min}$ i-ème voisin, puis on trace ces distances dans l'ordre décroissant et on cherche le coude.
 
 \section*{Métriques de performance en clustering}
 
