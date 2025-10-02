@@ -2073,4 +2073,120 @@ Cas d'utilisation & Applications actives & Firmware, code de démarrage & Stocka
 \subsection*{Conclusion}
 Les technologies de stockage persistant comme les HDDs, SSDs et NVMe jouent un rôle crucial dans les systèmes informatiques modernes. Les HDDs offrent une grande capacité à moindre coût, tandis que les SSDs et NVMe offrent des performances supérieures en termes de vitesse et d'efficacité énergétique. Comprendre ces différences est essentiel pour choisir la technologie de stockage appropriée en fonction des besoins spécifiques en termes de vitesse, capacité et coût.
 
+\section{Green Computing : Vers une Architecture Numérique Durable}
+
+\subsection{Introduction et Enjeux}
+Le \textit{Green Computing} (ou informatique durable) désigne l'ensemble des pratiques visant à réduire l'impact environnemental des technologies de l'information et de la communication (TIC), tout en optimisant leur efficacité énergétique et leur durabilité. Selon l'IEEE, il s'agit de développer et d'optimiser les puces, systèmes, réseaux et logiciels pour maximiser l'efficacité énergétique et minimiser les effets négatifs sur l'environnement \cite{ieee2025}.
+
+\subsubsection{Chiffres Clés (2024-2025)}
+\begin{itemize}
+    \item Les centres de données et les infrastructures informatiques représentent \textbf{1 à 1,5\% de la consommation mondiale d'électricité}, avec une croissance annuelle de 15 à 25\% en Europe, tirée par l'IA et le cloud \cite{gresb2025}.
+    \item Les émissions de CO$_2$ des TIC pourraient doubler d'ici 2025, passant de 7\% à 14\% des émissions mondiales \cite{nyabuto2024}.
+    \item En 2025, la demande électrique des centres de données en Europe pourrait atteindre \textbf{945 TWh}, soit presque le double de 2020 \cite{gresb2025}.
+\end{itemize}
+
+\subsection{Techniques et Innovations Récentes}
+
+\subsubsection{Optimisation Matérielle}
+\begin{table}[h]
+\centering
+\caption{Comparaison des architectures processeurs en termes d'efficacité énergétique (2025).}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Architecture} & \textbf{Consommation (W)} & \textbf{Performance/Watt} & \textbf{Exemple} \\ \hline
+x86 (Intel Core i7) & 65--125 & Modérée & Intel Sapphire Rapids \\ \hline
+ARM (Cortex-A76) & 5--10 & Élevée & Apple M2 \\ \hline
+RISC-V (SiFive) & 2--8 & Très élevée & SiFive Intelligence X280 \\ \hline
+Electron E1 & 0.5--2 & Exceptionnelle & Efficient Computer (2025) \\ \hline
+\end{tabular}
+\label{tab:green_processors}
+\end{table}
+
+\begin{itemize}
+    \item \textbf{Processeurs hybrides} : Les architectures combinant des cœurs performants (P-cores) et des cœurs éco-énergétiques (E-cores) offrent jusqu'à \textbf{2,1 fois plus d'efficacité énergétique} pour les calculs intensifs \cite{zytko2025}.
+    \item \textbf{Processeurs spécialisés} : Les NPU (Neural Processing Units) et TPU (Tensor Processing Units) de Google réduisent la consommation énergétique des tâches d'IA de \textbf{3 à 10 fois} par rapport aux GPU \cite{semiengineering2025}.
+    \item \textbf{Refroidissement durable} : L'immersion liquide permet une réduction de \textbf{30\%} de la consommation énergétique liée au refroidissement \cite{nature2025}.
+\end{itemize}
+
+\subsubsection{Optimisation Logicielle}
+\begin{itemize}
+    \item \textbf{Algorithmes éco-énergétiques} : Techniques de compression des données et de virtualisation pour réduire le temps de calcul et la consommation d'énergie \cite{acm2025}.
+    \item \textbf{Dynamic Voltage and Frequency Scaling (DVFS)} : Ajustement dynamique de la fréquence d'horloge des processeurs en fonction de la charge \cite{diversedaily2024}.
+    \item \textbf{Cloud et Edge Computing} : Le cloud vert (ex. : AWS, Google Cloud) utilise des énergies renouvelables et des processeurs éco-énergétiques (ex. : AWS Graviton3) \cite{cloudwards2025}.
+\end{itemize}
+
+\subsubsection{Gestion des Infrastructures}
+\begin{itemize}
+    \item \textbf{Centres de données verts} : Alimentation par énergies renouvelables (solaire, éolien) et réutilisation de la chaleur résiduelle pour chauffer des bâtiments \cite{nature2025}.
+    \item \textbf{Stratégies de décarbonation} : Utilisation de l'IA pour prédire et réduire la consommation (ex. : maintenance prédictive, allocation dynamique des ressources) \cite{frontiers2025}.
+\end{itemize}
+
+\subsection{Normes et Certifications (2024-2025)}
+\begin{table}[h]
+\centering
+\caption{Normes et certifications pour le Green Computing.}
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Norme/Certification} & \textbf{Description} & \textbf{Exemples d'Application} \\ \hline
+ISO 14001 & Système de management environnemental. & Centres de données, fabricants de matériel. \\ \hline
+EPEAT & Évalue l'impact environnemental des produits électroniques. & Ordinateurs, serveurs, écrans. \\ \hline
+Energy Star & Certification pour les équipements éco-énergétiques. & PC, imprimantes, centres de données. \\ \hline
+CGITP & Certification en pratiques IT durables. & Professionnels de l'IT. \\ \hline
+LEED & Certification pour les bâtiments durables. & Bâtiments et infrastructures IT. \\ \hline
+\end{tabular}
+\label{tab:green_certifications}
+\end{table}
+
+\subsection{Tendances Émergentes (2024-2025)}
+\begin{itemize}
+    \item \textbf{Intelligence Artificielle Verte} : Développement de modèles d'IA légers (ex. : TinyML) et optimisés pour les systèmes embarqués, réduisant la consommation énergétique de 50 à 70\% \cite{semiengineering2025}.
+    \item \textbf{Quantum Computing} : Potentiel de réduction drastique de la consommation énergétique pour certaines tâches \cite{datacenterfrontier2024}.
+    \item \textbf{Blockchain et Green IT} : Passage à des algorithmes de consensus moins énergivores (ex. : Proof-of-Stake) \cite{nyabuto2024}.
+    \item \textbf{Réglementations} : En Allemagne, les opérateurs de centres de données doivent implémenter un système de gestion énergétique d'ici 2026 \cite{gresb2025}.
+\end{itemize}
+
+\subsection{Études de Cas Récentes}
+\begin{itemize}
+    \item \textbf{Google} : Réduction de 30\% de la consommation énergétique de ses centres de données grâce à l'IA et au refroidissement par immersion \cite{nature2025}.
+    \item \textbf{NREL} : Utilisation de supercalculateurs (ex. : Kestrel, 56 petaflops) pour accélérer la recherche sur les énergies renouvelables \cite{nrel2024}.
+    \item \textbf{Efficient Computer} : Lancement du processeur Electron E1 (CES 2025), 100 fois plus éco-énergétique que les CPU classiques \cite{efficient2025}.
+\end{itemize}
+
+\subsection{Conclusion et Perspectives}
+Le \textit{Green Computing} est désormais une priorité pour les acteurs du numérique, poussée par la réglementation, la demande des consommateurs et l'innovation technologique. Les défis restent importants, notamment pour concilier performance et durabilité, mais les avancées récentes (processeurs hybrides, refroidissement innovant, IA verte) ouvrent des perspectives prometteuses pour une informatique plus respectueuse de l'environnement.
+
+% Références (à ajouter dans ta bibliographie)
+\begin{thebibliography}{9}
+\bibitem{ieee2025}
+IEEE, \textit{A Comprehensive Review of Green Computing: Past, Present, and Future Research}, 2025.
+
+\bibitem{gresb2025}
+GRESB, \textit{The Data Center Boom: Navigating Growth and Sustainability}, 2025.
+
+\bibitem{efficient2025}
+Efficient Computer, \textit{Electron E1 Processor}, CES 2025.
+
+\bibitem{nature2025}
+npj Urban Sustainability, \textit{Decarbonising Digital Infrastructure}, 2025.
+
+\bibitem{cloudwards2025}
+Cloudwards, \textit{Cloud Sustainability Statistics}, 2025.
+
+\bibitem{frontiers2025}
+Frontiers in Sustainability, \textit{Forecasting US Data Center CO2 Emissions Using AI Models}, 2025.
+
+\bibitem{semiengineering2025}
+SemiEngineering, \textit{Will New Processor Architectures Raise Energy Efficiency?}, 2025.
+
+\bibitem{zytko2025}
+D. Żytko, \textit{Analysis of Performance and Energy Efficiency of Processors with Hybrid Architecture}, JCSI, 2025.
+
+\bibitem{nyabuto2024}
+G. Nyabuto, \textit{A Review of Current Research Trends in Green Computing}, East African Journal of Information Technology, 2024.
+
+\bibitem{nrel2024}
+NREL, \textit{High-Performance Computing Advanced More Than 425 Energy Research Projects in 2024}, 2024.
+\end{thebibliography}
+
+
 \end{document}
